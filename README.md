@@ -2,6 +2,8 @@
 
 This repository contains a Flask-based web application that performs image manipulation detection using **Error Level Analysis (ELA)** and a **Convolutional Neural Network (CNN)** model. It enables users to upload images through a user-friendly web interface and classifies each image as either **real** or **fake** based on forensic compression artifacts.
 
+🌐 **Live Demo**: [https://deepfake-detect.up.railway.app/](https://deepfake-detect.up.railway.app/)
+
 ## 📚 Overview
 
 The system applies ELA to JPEG images to visualize potential regions of tampering. These enhanced images are then passed through a lightweight CNN architecture trained on labeled datasets to perform binary classification.
