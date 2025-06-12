@@ -59,4 +59,4 @@ This project serves as an academic implementation to explore the effectiveness o
 
 ---
 
-This project is intended for academic and research purposes only. 
+<p style="text-align:center;">This project is intended for academic and research purposes only.</p>
