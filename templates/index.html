@@ -1,0 +1,157 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deepfake Detector</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .card {
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .btn-primary {
+      border-radius: 2rem;
+    }
+    .preview-img {
+      max-height: 300px;
+      object-fit: contain;
+      border-radius: 0.5rem;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    .preview-img:hover {
+      transform: scale(1.05);
+      opacity: 0.85;
+    }
+
+    .fade-in {
+    animation: fadeIn 0.6s ease-in-out;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+    }
+    #drop-area.border-primary {
+        background-color: #eaf4ff;
+    }
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Deepfake Detector</a>
+  </div>
+</nav>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card p-4">
+        <h3 class="text-center mb-4">Upload Image for Prediction</h3>
+        <form method="post" enctype="multipart/form-data" id="upload-form">
+            <div id="drop-area" class="mb-3 border border-2 rounded p-4 text-center bg-light position-relative" style="cursor: pointer; transition: border .3s;">
+              <p class="text-muted mb-2">Drag & drop image here or click to browse</p>
+              <input id="file-input" class="form-control d-none" type="file" name="file" accept="image/*" required>
+              <img id="preview" class="preview-img mt-3 d-none fade-in rounded" alt="Preview" />
+            </div>
+            <div class="text-center">
+              <button class="btn btn-primary px-4 mt-2" type="submit">Predict</button>
+            </div>
+          </form>
+
+        {% if filename %}
+        <hr>
+        <h5 class="text-center">Result</h5>
+        <div class="text-center">
+          <img id="result-img"
+               src="{{ url_for('static', filename='uploads/' + filename) }}"
+               data-original="{{ url_for('static', filename='uploads/' + filename) }}"
+               data-ela="{{ url_for('static', filename='ela/' + ela_filename) }}"
+               class="preview-img mb-3"
+               alt="Uploaded Image"
+               onmouseover="this.src=this.dataset.ela"
+               onmouseout="this.src=this.dataset.original">
+          <p class="fs-5">
+            <strong>Prediction:</strong> <span class="text-info">{{ prediction }}</span><br>
+            <strong>Confidence:</strong> {{ confidence }}%
+          </p>
+          <a href="/" class="btn btn-outline-secondary btn-sm">Try Another</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    const dropArea = document.getElementById('drop-area');
+    const fileInput = document.getElementById('file-input');
+    const preview = document.getElementById('preview');
+  
+    const validTypes = ['image/jpeg', 'image/png'];
+    const maxSizeMB = 5;
+  
+    // Handle highlighting
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropArea.addEventListener(eventName, e => {
+        e.preventDefault();
+        dropArea.classList.add('border-primary');
+      });
+    });
+  
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, e => {
+        e.preventDefault();
+        dropArea.classList.remove('border-primary');
+      });
+    });
+  
+    dropArea.addEventListener('click', () => fileInput.click());
+  
+    dropArea.addEventListener('drop', e => {
+      const file = e.dataTransfer.files[0];
+      if (validateFile(file)) {
+        fileInput.files = e.dataTransfer.files;
+        showPreview(file);
+      }
+    });
+  
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files[0];
+      if (validateFile(file)) {
+        showPreview(file);
+      }
+    });
+  
+    function validateFile(file) {
+      if (!validTypes.includes(file.type)) {
+        alert('Only JPG and PNG images are allowed.');
+        return false;
+      }
+      if (file.size > maxSizeMB * 1024 * 1024) {
+        alert(`Max file size is ${maxSizeMB}MB.`);
+        return false;
+      }
+      return true;
+    }
+  
+    function showPreview(file) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        preview.src = e.target.result;
+        preview.classList.remove('d-none');
+        preview.classList.add('fade-in');
+      };
+      reader.readAsDataURL(file);
+    }
+  </script>
+  
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
