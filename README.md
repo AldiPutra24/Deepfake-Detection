@@ -40,12 +40,19 @@ This project serves as an academic implementation to explore the effectiveness o
 
 ## 📁 Project Structure
 ├── app.py # Main Flask application
+
 ├── model.py # CNN architecture and ELA function
+
 ├── templates/
+
 │ └── index.html # Web UI (Bootstrap-based)
+
 ├── static/ # Uploaded images
+
 ├── model/
+
 │ └── best_model_converted.h5 # Trained CNN model
+
 └── requirements.txt # Python dependencies
 
 ---
