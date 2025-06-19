@@ -61,6 +61,12 @@
             <div class="text-center">
               <button class="btn btn-primary px-4 mt-2" type="submit">Predict</button>
             </div>
+            </div>
+          <!-- Spinner -->
+          <div id="loading-spinner" class="text-center mt-3 d-none">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2">Processing images, please wait...</p>
+          </div>
           </form>
 
         {% if filename %}
@@ -138,6 +144,9 @@
       }
       return true;
     }
+
+    document.getElementById("upload-form").addEventListener("submit", function () {
+    document.getElementById("loading-spinner").classList.remove("d-none");});
   
     function showPreview(file) {
       const reader = new FileReader();
