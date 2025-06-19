@@ -22,39 +22,35 @@ def index():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    file = request.files.get('file')
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        filepath = os.path.join('static/uploads', filename)
-        file.save(filepath)
+    try:
+        file = request.files.get('file')
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            filepath = os.path.join('static/uploads', filename)
+            file.save(filepath)
 
-        # Konversi ke ELA dan simpan
-        ela_array = convert_to_ela_image(filepath, quality=90, resize_to=(224, 224))
-        ela_image = Image.fromarray((ela_array * 255).astype(np.uint8))
-        ela_path = os.path.join('static/ela', filename)
-        ela_image.save(ela_path)
+            # Konversi ke ELA dan simpan
+            ela_array = convert_to_ela_image(filepath, quality=90, resize_to=(224, 224))
+            ela_image = Image.fromarray((ela_array * 255).astype(np.uint8))
+            ela_path = os.path.join('static/ela', filename)
+            ela_image.save(ela_path)
 
-        # Prediksi menggunakan model CNN
-        img_batch = np.expand_dims(ela_array, axis=0)
-        prediction_probs = model.predict(img_batch)[0]
-        predicted_index = np.argmax(prediction_probs)
-        prediction_label = class_labels[predicted_index]
-        confidence = round(prediction_probs[predicted_index] * 100, 2)
+            # Prediksi
+            img_batch = np.expand_dims(ela_array, axis=0)
+            prediction_probs = model.predict(img_batch)[0]
+            predicted_index = np.argmax(prediction_probs)
+            prediction_label = class_labels[predicted_index]
+            confidence = round(prediction_probs[predicted_index] * 100, 2)
 
-        return jsonify({
-            'success': True,
-            'filename': filename,
-            'prediction': prediction_label,
-            'confidence': confidence
-        })
-    return jsonify({'success': False, 'message': 'Invalid file format or no file uploaded'})
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'jpg', 'jpeg', 'png'}
-
-def secure_filename(filename):
-    return filename.replace(" ", "_")
-
-if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 8080))
-    app.run(host='0.0.0.0', port=port)
+            return jsonify({
+                'success': True,
+                'filename': filename,
+                'prediction': prediction_label,
+                'confidence': confidence
+            })
+        else:
+            return jsonify({'success': False, 'message': 'Invalid file format or no file uploaded'})
+    except Exception as e:
+        # Log error ke terminal/server logs
+        current_app.logger.error("Prediction error: %s", str(e))
+        return jsonify({'success': False, 'message': f'Server error: {str(e)}'})
