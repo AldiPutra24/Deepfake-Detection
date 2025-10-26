@@ -63,4 +63,4 @@ This project serves as an academic implementation to explore the effectiveness o
 
 ---
 
-ALDI PUTRA MIFTAQULL ULLUM
+<p align="center">ALDI PUTRA MIFTAQULL ULLUM</p>
